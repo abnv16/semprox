@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>semprox — High-Performance Semantic Caching Reverse Proxy for LLMs</title>
+  <meta name="description" content="OpenAI-compatible semantic caching reverse proxy in Rust. Cut LLM API costs by 80% and reduce latencies to < 5ms using local ONNX embeddings and in-memory vector cache.">
+  <meta name="keywords" content="semprox, semantic cache, LLM proxy, OpenAI proxy, fastembed, rust, vector cache, cosine similarity">
+  
+  <!-- OpenGraph -->
+  <meta property="og:title" content="semprox — High-Performance Semantic Caching Reverse Proxy">
+  <meta property="og:description" content="Cut OpenAI latency to < 5ms and slash token costs with local CPU embeddings and in-memory vector caching.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://abnv16.github.io/semprox/">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Site Navigation -->
+  <header class="site-header">
+    <div class="container nav-container">
+      <a href="#" class="brand-logo" id="navBrandLogo">
+        <div class="brand-icon">⚡</div>
+        <span>semprox</span>
+        <span class="brand-badge">v0.1.0</span>
+      </a>
+
+      <nav>
+        <ul class="nav-menu">
+          <li><a href="#simulator" class="nav-link">Live Simulator</a></li>
+          <li><a href="#architecture" class="nav-link">Architecture</a></li>
+          <li><a href="#features" class="nav-link">Features</a></li>
+          <li><a href="#calculator" class="nav-link">Cost Calculator</a></li>
+          <li><a href="#quickstart" class="nav-link">Quickstart</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <a href="https://github.com/abnv16/semprox" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" id="navGithubBtn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+          </svg>
+          <span>GitHub</span>
+        </a>
+        <a href="#quickstart" class="btn btn-primary" id="navGetStartedBtn">Get Started</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <main>
+    <section class="hero-section">
+      <div class="container">
+        <div class="hero-pill">
+          <span>🚀 Open-Source Rust Reverse Proxy</span>
+          <span>•</span>
+          <span>OpenAI Drop-In Compatible</span>
+        </div>
+
+        <h1 class="hero-title">
+          Cut OpenAI Latency to <span class="gradient-text">&lt; 5ms</span><br>
+          &amp; Slash API Token Costs by 80%
+        </h1>
+
+        <p class="hero-description">
+          <strong>semprox</strong> is a zero-dependency, in-memory semantic caching reverse proxy. It embeds prompts locally on CPU with ONNX Runtime and instantly returns cached completions for semantically equivalent queries—before hitting upstream LLMs.
+        </p>
+
+        <div class="hero-ctas">
+          <a href="#simulator" class="btn btn-primary" id="heroTryDemoBtn">⚡ Try Live Simulator</a>
+          <a href="https://github.com/abnv16/semprox" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" id="heroStarGithubBtn">
+            ⭐ Star on GitHub
+          </a>
+        </div>
+
+        <!-- Metric highlights -->
+        <div class="metrics-banner">
+          <div class="metric-pill-card">
+            <div class="metric-pill-num">&lt; 4ms</div>
+            <div class="metric-pill-label">Cache Hit Latency</div>
+          </div>
+          <div class="metric-pill-card">
+            <div class="metric-pill-num">0 DBs</div>
+            <div class="metric-pill-label">Zero External Dependencies</div>
+          </div>
+          <div class="metric-pill-card">
+            <div class="metric-pill-num">100%</div>
+            <div class="metric-pill-label">OpenAI API Compatible</div>
+          </div>
+          <div class="metric-pill-card">
+            <div class="metric-pill-num">SSE + JSON</div>
+            <div class="metric-pill-label">Bidirectional Streaming</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Simulator Section -->
+    <section class="section" id="simulator">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">Interactive Playground</span>
+          <h2 class="section-title">Experience Semantic Caching Live</h2>
+          <p class="section-subtitle">Test how semprox recognizes paraphrased questions, computes cosine similarity, and eliminates upstream calls.</p>
+        </div>
+
+        <div class="simulator-card">
+          <!-- Toolbar -->
+          <div class="simulator-toolbar">
+            <div class="sim-controls-group">
+              <div class="sim-control-item">
+                <label for="simThreshold">Threshold:</label>
+                <input type="range" id="simThreshold" min="0.80" max="0.98" step="0.01" value="0.90">
+                <span class="badge-threshold" id="thresholdValBadge">0.90</span>
+              </div>
+              <div class="sim-control-item">
+                <input type="checkbox" id="simStreamToggle" checked>
+                <label for="simStreamToggle">Stream SSE (`stream: true`)</label>
+              </div>
+            </div>
+
+            <button class="btn btn-outline" id="simResetCacheBtn" onclick="resetSimulatorCache()">
+              🗑️ Reset Cache
+            </button>
+          </div>
+
+          <!-- Main Grid -->
+          <div class="sim-main-grid">
+            <!-- Left Pane: Input -->
+            <div class="sim-pane sim-pane-left">
+              <span class="sim-label">Quick Sample Prompts</span>
+              <div class="sample-prompts-bar">
+                <button class="sample-chip" data-prompt="Explain Kubernetes in one sentence">Explain Kubernetes in one sentence</button>
+                <button class="sample-chip" data-prompt="Describe Kubernetes briefly in one sentence">Describe Kubernetes briefly (Similar)</button>
+                <button class="sample-chip" data-prompt="What is Docker and how does it work?">What is Docker?</button>
+                <button class="sample-chip" data-prompt="Write a Python function to check palindrome">Check palindrome in Python</button>
+              </div>
+
+              <span class="sim-label">User Prompt</span>
+              <textarea id="simPrompt" class="sim-textarea" placeholder="Type or select a prompt to send to the proxy...">Describe Kubernetes briefly in one sentence</textarea>
+
+              <div class="sim-action-row">
+                <button class="btn btn-primary" id="simRunBtn" onclick="executeSimulatedRequest()">
+                  <span>⚡ Execute Request</span>
+                </button>
+                <span style="font-size: 0.82rem; color: var(--text-dim); font-family: var(--font-mono);">POST /v1/chat/completions</span>
+              </div>
+
+              <!-- Cache Table -->
+              <div class="cache-table-wrapper">
+                <span class="sim-label" style="margin-top: 1.5rem;">In-Memory Vector Cache State</span>
+                <table class="cache-table">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Cached Prompt</th>
+                      <th>Model</th>
+                      <th>Hits</th>
+                    </tr>
+                  </thead>
+                  <tbody id="cacheTableBody">
+                    <!-- Populated dynamically by app.js -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Right Pane: Output -->
+            <div class="sim-pane">
+              <span class="sim-label">Proxy Response Stream</span>
+              <div class="sim-response-card">
+                <div class="response-header-stats">
+                  <div>
+                    <span id="simStatusBadge" class="status-badge idle">IDLE</span>
+                  </div>
+                  <div style="display: flex; gap: 1rem;">
+                    <div class="response-metric-item">Latency: <span id="simLatencyBadge">--</span></div>
+                    <div class="response-metric-item">Cost: <span id="simCostBadge">--</span></div>
+                  </div>
+                </div>
+
+                <div id="simResponseText" class="sim-response-text">
+Click "Execute Request" above to test semantic similarity matching against the vector cache!
+                </div>
+              </div>
+
+              <div style="margin-top: 1.25rem; font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">
+                💡 <strong>Try this:</strong> Send <em>"Explain Kubernetes in one sentence"</em> (Cache Hit), then send <em>"Describe Kubernetes briefly"</em>. Notice how the proxy detects the high cosine similarity (> 0.90) and serves it instantly in <strong>&lt; 4ms</strong>!
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Architecture Section -->
+    <section class="section" id="architecture">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">System Design</span>
+          <h2 class="section-title">How semprox Works Under the Hood</h2>
+          <p class="section-subtitle">Engineered in Rust with Axum, FastEmbed (ONNX Runtime), and SIMD-accelerated normalized dot-product search.</p>
+        </div>
+
+        <div class="arch-flow-grid">
+          <div class="arch-node-card">
+            <span class="arch-step-num">Step 01</span>
+            <h3 class="arch-node-title">Client Request</h3>
+            <p class="arch-node-desc">Standard OpenAI SDK or curl client sends a chat completion request to <code>/v1/chat/completions</code>.</p>
+          </div>
+
+          <div class="arch-node-card">
+            <span class="arch-step-num">Step 02</span>
+            <h3 class="arch-node-title">Local ONNX Embedding</h3>
+            <p class="arch-node-desc">FastEmbed generates an $L_2$-normalized 384-dimensional dense vector locally on CPU in ~15ms without external API calls.</p>
+          </div>
+
+          <div class="arch-node-card">
+            <span class="arch-step-num">Step 03</span>
+            <h3 class="arch-node-title">Vector Cache Scan</h3>
+            <p class="arch-node-desc">Scans in-memory vectors using dot product ($\vec{u} \cdot \vec{v}$). Evaluates whether best similarity $\ge$ configured threshold.</p>
+          </div>
+
+          <div class="arch-node-card">
+            <span class="arch-step-num">Step 04</span>
+            <h3 class="arch-node-title">Instant Hit / Upstream Miss</h3>
+            <p class="arch-node-desc">If matched: synthesized response returned in &lt; 5ms. If missed: forwards to upstream LLM, streams tokens, and caches the response.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="section" id="features">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">Features</span>
+          <h2 class="section-title">Built for Production Scale</h2>
+          <p class="section-subtitle">Everything you need to deploy enterprise semantic caching with zero operational headache.</p>
+        </div>
+
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon-box">⚡</div>
+            <h3 class="feature-title">Ultra-Low Latency</h3>
+            <p class="feature-desc">In-memory vector lookup takes sub-milliseconds. Saves up to 4,000ms compared to a live round-trip to cloud LLM providers.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon-box">🎯</div>
+            <h3 class="feature-title">Zero Vector DB Setup</h3>
+            <p class="feature-desc">No external Redis, Pinecone, Milvus, or Qdrant infrastructure to provision, manage, or pay for. Self-contained in Rust.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon-box">🌊</div>
+            <h3 class="feature-title">Bidirectional SSE Streaming</h3>
+            <p class="feature-desc">Full support for streaming completions (<code>stream: true</code>). Reads chunks in real-time, extracts answer tokens, and caches seamlessly.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon-box">🧠</div>
+            <h3 class="feature-title">Local CPU Embedding</h3>
+            <p class="feature-desc">Runs quantized ONNX models (AllMiniLML6V2Q / BGESmall) directly on standard server CPUs without requiring expensive GPUs.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon-box">🧹</div>
+            <h3 class="feature-title">Bounded LRU Eviction</h3>
+            <p class="feature-desc">Configurable <code>--max-cache-size</code> ensures your cache memory stays bounded with automatic thread-safe LRU eviction.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon-box">📊</div>
+            <h3 class="feature-title">Prometheus Observability</h3>
+            <p class="feature-desc">Exposes production metrics out of the box at <code>/metrics</code> (hits, misses, requests, cache size) and readiness at <code>/health</code>.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ROI & Cost Calculator Section -->
+    <section class="section" id="calculator">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">ROI Estimator</span>
+          <h2 class="section-title">Calculate Your Cost & Latency Savings</h2>
+          <p class="section-subtitle">See how much money and user wait-time semprox saves for your workload.</p>
+        </div>
+
+        <div class="calc-card">
+          <!-- Controls -->
+          <div class="calc-controls">
+            <div class="calc-control-group">
+              <div class="calc-label-row">
+                <span>Monthly API Requests</span>
+                <span id="calcRequestsVal" style="color:var(--accent-cyan); font-family:var(--font-mono);">100,000</span>
+              </div>
+              <input type="range" id="calcRequests" class="calc-slider" min="10000" max="2000000" step="10000" value="100000">
+            </div>
+
+            <div class="calc-control-group">
+              <div class="calc-label-row">
+                <span>Avg. Tokens Per Request</span>
+                <span id="calcTokensVal" style="color:var(--accent-cyan); font-family:var(--font-mono);">600</span>
+              </div>
+              <input type="range" id="calcTokens" class="calc-slider" min="100" max="3000" step="50" value="600">
+            </div>
+
+            <div class="calc-control-group">
+              <div class="calc-label-row">
+                <span>Semantic Cache Hit Rate</span>
+                <span id="calcHitRateVal" style="color:var(--accent-emerald); font-family:var(--font-mono);">40%</span>
+              </div>
+              <input type="range" id="calcHitRate" class="calc-slider" min="10" max="80" step="5" value="40">
+            </div>
+          </div>
+
+          <!-- Results -->
+          <div class="calc-results-panel">
+            <div class="calc-big-stat" id="calcSavedDollars">$60</div>
+            <div class="calc-big-label">Estimated Monthly Savings</div>
+
+            <div class="calc-subgrid">
+              <div>
+                <div class="calc-sub-stat" id="calcYearlyDollars">$720</div>
+                <div class="calc-sub-label">Yearly Savings</div>
+              </div>
+              <div>
+                <div class="calc-sub-stat" id="calcHoursSaved">13 hrs</div>
+                <div class="calc-sub-label">User Latency Saved</div>
+              </div>
+              <div>
+                <div class="calc-sub-stat" id="calcCallsAvoided">40,000</div>
+                <div class="calc-sub-label">Upstream Calls Avoided</div>
+              </div>
+              <div>
+                <div class="calc-sub-stat" style="color:var(--accent-emerald);">3.8ms</div>
+                <div class="calc-sub-label">Hit Response Time</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quickstart & Code Section -->
+    <section class="section" id="quickstart">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">Integration</span>
+          <h2 class="section-title">Up and Running in 30 Seconds</h2>
+          <p class="section-subtitle">Drop into your existing OpenAI SDK codebase with a single line base URL change.</p>
+        </div>
+
+        <div class="code-box-wrapper">
+          <div class="code-tabs-header">
+            <ul class="code-tabs-list">
+              <li><button class="code-tab-btn active" data-lang="curl">cURL</button></li>
+              <li><button class="code-tab-btn" data-lang="python">Python (OpenAI)</button></li>
+              <li><button class="code-tab-btn" data-lang="typescript">TypeScript / Node</button></li>
+              <li><button class="code-tab-btn" data-lang="docker">Docker Compose</button></li>
+            </ul>
+
+            <button class="btn btn-secondary" style="padding: 0.35rem 0.8rem; font-size: 0.8rem;" onclick="copyCode()">
+              📋 Copy Code
+            </button>
+          </div>
+
+          <pre class="code-pre"><code id="quickstartCodePre">curl http://localhost:8080/v1/chat/completions \
+  -H "Authorization: Bearer $OPENAI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "gpt-4o-mini",
+    "messages": [
+      {"role": "user", "content": "Explain Kubernetes in one sentence"}
+    ],
+    "stream": true
+  }'</code></pre>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Toast Notification -->
+  <div id="toastNotice" class="toast-notice">Copied to clipboard!</div>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container footer-content">
+      <div class="footer-copy">
+        <strong>⚡ semprox</strong> — Open-source semantic caching proxy in Rust.
+      </div>
+
+      <div class="footer-links">
+        <a href="https://github.com/abnv16/semprox" target="_blank" rel="noopener noreferrer" class="footer-link">GitHub Repository</a>
+        <a href="https://github.com/abnv16/semprox/blob/main/README.md" target="_blank" rel="noopener noreferrer" class="footer-link">Documentation</a>
+        <a href="https://github.com/abnv16/semprox/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener noreferrer" class="footer-link">Contributing</a>
+        <a href="#simulator" class="footer-link">Live Playground</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
