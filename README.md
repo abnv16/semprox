@@ -1,10 +1,10 @@
 <div align="center">
 
-# ⚡ semantic-cache-proxy
+# ⚡ semprox
 
 **A high-performance, OpenAI-compatible semantic caching reverse proxy written in Rust.**
 
-[![CI](https://github.com/abhinavp/semantic-cache-proxy/actions/workflows/ci.yml/badge.svg)](https://github.com/abhinavp/semantic-cache-proxy/actions/workflows/ci.yml)
+[![CI](https://github.com/abnv16/semprox/actions/workflows/ci.yml/badge.svg)](https://github.com/abnv16/semprox/actions/workflows/ci.yml)
 [![Rust](https://img.shields.io/badge/rust-1.80%2B-orange.svg)](https://www.rust-lang.org)
 [![Docker](https://img.shields.io/badge/docker-supported-2496ED.svg)](Dockerfile)
 
@@ -26,7 +26,7 @@ Traditional exact-match caching (like Redis key-value hashing) fails when users 
 
 Standard caches treat these as separate requests, hitting upstream LLMs every time, incurring monetary token costs and 1,000ms–5,000ms latency.
 
-**`semantic-cache-proxy`** sits transparently between your application and OpenAI (or any OpenAI-compatible API). It computes semantic embeddings locally using CPU-optimized ONNX models (FastEmbed) and evaluates cosine similarity against previous responses. If a match exceeds your similarity threshold (e.g., `0.90`), it returns the cached completion instantly—**in less than 5ms**.
+**`semprox`** sits transparently between your application and OpenAI (or any OpenAI-compatible API). It computes semantic embeddings locally using CPU-optimized ONNX models (FastEmbed) and evaluates cosine similarity against previous responses. If a match exceeds your similarity threshold (e.g., `0.90`), it returns the cached completion instantly—**in less than 5ms**.
 
 ---
 
@@ -47,7 +47,7 @@ Standard caches treat these as separate requests, hitting upstream LLMs every ti
 ```mermaid
 flowchart TD
     Client(["Application / Client"])
-    Proxy["semantic-cache-proxy"]
+    Proxy["semprox"]
     FastEmbed["Local FastEmbed (ONNX)"]
     VectorStore[("In-Memory Vector Cache<br/>(Cosine Similarity + LRU)")]
     Upstream["Upstream LLM<br/>(OpenAI / vLLM / Ollama)"]
@@ -75,8 +75,8 @@ flowchart TD
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/abhinavp/semantic-cache-proxy.git
-   cd semantic-cache-proxy
+   git clone https://github.com/abnv16/semprox.git
+   cd semprox
    ```
 2. Start the proxy:
    ```bash
@@ -99,7 +99,7 @@ flowchart TD
 cargo build --release
 
 # Run proxy with custom threshold
-RUST_LOG=info ./target/release/semantic-cache-proxy \
+RUST_LOG=info ./target/release/semprox \
   --port 8080 \
   --upstream-url https://api.openai.com \
   --similarity-threshold 0.90 \
@@ -169,7 +169,7 @@ The response is returned **immediately without hitting OpenAI**!
 
 ### 3. Monitoring & Metrics
 
-`semantic-cache-proxy` exports standard Prometheus metrics on `GET /metrics`:
+`semprox` exports standard Prometheus metrics on `GET /metrics`:
 
 ```bash
 curl http://localhost:8080/metrics

@@ -1,9 +1,11 @@
 [package]
-name = "semantic-cache-proxy"
+name = "semprox"
 version = "0.1.0"
 edition = "2021"
 description = "High-performance OpenAI-compatible semantic caching reverse proxy with local vector embeddings"
 readme = "README.md"
+repository = "https://github.com/abnv16/semprox"
+homepage = "https://github.com/abnv16/semprox"
 keywords = ["openai", "semantic-cache", "proxy", "llm", "fastembed"]
 categories = ["network-programming", "web-programming::http-server", "science"]
 

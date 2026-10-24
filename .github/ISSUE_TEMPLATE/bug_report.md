@@ -1,6 +1,6 @@
 ---
 name: Bug Report
-about: Create a report to help us improve semantic-cache-proxy
+about: Create a report to help us improve semprox
 title: '[BUG] '
 labels: bug
 assignees: ''

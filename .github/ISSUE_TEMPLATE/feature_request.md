@@ -1,6 +1,6 @@
 ---
 name: Feature Request
-about: Suggest an idea or feature for semantic-cache-proxy
+about: Suggest an idea or feature for semprox
 title: '[FEAT] '
 labels: enhancement
 assignees: ''

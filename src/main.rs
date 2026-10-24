@@ -15,7 +15,7 @@ use tracing_subscriber::EnvFilter;
 
 #[derive(Debug, Parser)]
 #[command(
-    name = "semantic-cache-proxy",
+    name = "semprox",
     version,
     about = "OpenAI-compatible semantic caching reverse proxy"
 )]

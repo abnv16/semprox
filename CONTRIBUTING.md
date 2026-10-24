@@ -1,6 +1,6 @@
-# Contributing to semantic-cache-proxy
+# Contributing to semprox
 
-Thank you for your interest in contributing to **semantic-cache-proxy**! We welcome bug reports, feature requests, documentation improvements, and code contributions from everyone.
+Thank you for your interest in contributing to **semprox**! We welcome bug reports, feature requests, documentation improvements, and code contributions from everyone.
 
 This document outlines the workflow and best practices to ensure an easy and productive contribution experience.
 
@@ -28,8 +28,8 @@ All contributors and participants are expected to adhere to our [Code of Conduct
 
 1. Fork the repository on GitHub and clone your fork:
    ```bash
-   git clone https://github.com/<your-username>/semantic-cache-proxy.git
-   cd semantic-cache-proxy
+   git clone https://github.com/abnv16/semprox.git
+   cd semprox
    ```
 2. Build the project:
    ```bash

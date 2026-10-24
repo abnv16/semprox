@@ -1,12 +1,12 @@
 version: '3.8'
 
 services:
-  semantic-cache-proxy:
+  semprox:
     build:
       context: .
       dockerfile: Dockerfile
-    image: semantic-cache-proxy:latest
-    container_name: semantic-cache-proxy
+    image: semprox:latest
+    container_name: semprox
     restart: unless-stopped
     ports:
       - "8080:8080"

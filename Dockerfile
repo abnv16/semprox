@@ -34,7 +34,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy compiled binary from builder stage
-COPY --from=builder /app/target/release/semantic-cache-proxy /usr/local/bin/semantic-cache-proxy
+COPY --from=builder /app/target/release/semprox /usr/local/bin/semprox
 
 # Create directory for model cache
 RUN mkdir -p /app/models && chown -R 1000:1000 /app
@@ -53,4 +53,4 @@ EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
   CMD curl -f http://localhost:8080/health || exit 1
 
-ENTRYPOINT ["semantic-cache-proxy"]
+ENTRYPOINT ["semprox"]
