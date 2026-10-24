@@ -28,8 +28,11 @@ pub static CACHE_MISSES: Lazy<Counter> = Lazy::new(|| {
 });
 
 pub static REQUESTS_TOTAL: Lazy<Counter> = Lazy::new(|| {
-    register_counter!("semantic_cache_requests_total", "Total chat completion requests")
-        .expect("metric registration failed")
+    register_counter!(
+        "semantic_cache_requests_total",
+        "Total chat completion requests"
+    )
+    .expect("metric registration failed")
 });
 
 pub static CACHE_SIZE: Lazy<IntGauge> = Lazy::new(|| {
@@ -169,7 +172,9 @@ fn cached_json_response(model: &str, content: &str, similarity: f32) -> Response
     });
 
     let mut response = Json(resp_json).into_response();
-    response.headers_mut().insert("X-Cache", HeaderValue::from_static("HIT"));
+    response
+        .headers_mut()
+        .insert("X-Cache", HeaderValue::from_static("HIT"));
     if let Ok(sim_val) = HeaderValue::from_str(&format!("{:.4}", similarity)) {
         response.headers_mut().insert("X-Cache-Similarity", sim_val);
     }
@@ -389,8 +394,12 @@ async fn chat_completions_handler(
         }
 
         let mut response = (StatusCode::OK, resp_bytes).into_response();
-        response.headers_mut().insert("Content-Type", HeaderValue::from_static("application/json"));
-        response.headers_mut().insert("X-Cache", HeaderValue::from_static("MISS"));
+        response
+            .headers_mut()
+            .insert("Content-Type", HeaderValue::from_static("application/json"));
+        response
+            .headers_mut()
+            .insert("X-Cache", HeaderValue::from_static("MISS"));
         response
     } else {
         let mut upstream_stream = upstream_res.bytes_stream();
@@ -447,14 +456,12 @@ async fn chat_completions_handler(
         };
 
         let body = axum::body::Body::from_stream(stream);
-        let response = Response::builder()
+        Response::builder()
             .header("Content-Type", "text/event-stream")
             .header("Cache-Control", "no-cache")
             .header("Connection", "keep-alive")
             .header("X-Cache", "MISS")
             .body(body)
-            .unwrap_or_default();
-
-        response
+            .unwrap_or_default()
     }
 }

@@ -127,3 +127,106 @@ impl SemanticCache {
         self.entries.write().clear();
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_exact_match_hit() {
+        let cache = SemanticCache::new(10, 0.90);
+        let embedding = vec![1.0, 0.0, 0.0];
+
+        cache.insert(
+            "gpt-4o-mini".to_string(),
+            "Explain Kubernetes".to_string(),
+            embedding.clone(),
+            "Kubernetes is a container orchestration tool.".to_string(),
+        );
+
+        let hit = cache.lookup("gpt-4o-mini", &embedding);
+        assert!(hit.is_some());
+        let hit = hit.unwrap();
+        assert_eq!(hit.content, "Kubernetes is a container orchestration tool.");
+        assert!((hit.similarity - 1.0).abs() < 1e-4);
+    }
+
+    #[test]
+    fn test_similarity_threshold() {
+        let cache = SemanticCache::new(10, 0.90);
+        cache.insert(
+            "gpt-4o-mini".to_string(),
+            "Prompt 1".to_string(),
+            vec![1.0, 0.0, 0.0],
+            "Answer 1".to_string(),
+        );
+
+        // Vector orthogonal (sim = 0.0) -> miss
+        let miss = cache.lookup("gpt-4o-mini", &[0.0, 1.0, 0.0]);
+        assert!(miss.is_none());
+
+        // Vector with sim ~ 0.95 -> hit
+        let hit = cache.lookup("gpt-4o-mini", &[0.95, 0.1, 0.0]);
+        assert!(hit.is_some());
+    }
+
+    #[test]
+    fn test_model_isolation() {
+        let cache = SemanticCache::new(10, 0.90);
+        let embedding = vec![1.0, 0.0, 0.0];
+
+        cache.insert(
+            "gpt-4o".to_string(),
+            "Prompt".to_string(),
+            embedding.clone(),
+            "GPT-4 Answer".to_string(),
+        );
+
+        // Querying with different model shouldn't hit
+        let miss = cache.lookup("gpt-4o-mini", &embedding);
+        assert!(miss.is_none());
+
+        // Querying with exact model hits
+        let hit = cache.lookup("gpt-4o", &embedding);
+        assert!(hit.is_some());
+    }
+
+    #[test]
+    fn test_lru_eviction() {
+        let cache = SemanticCache::new(2, 0.90);
+
+        cache.insert(
+            "model".to_string(),
+            "prompt1".to_string(),
+            vec![1.0, 0.0, 0.0],
+            "answer1".to_string(),
+        );
+        std::thread::sleep(std::time::Duration::from_millis(10));
+
+        cache.insert(
+            "model".to_string(),
+            "prompt2".to_string(),
+            vec![0.0, 1.0, 0.0],
+            "answer2".to_string(),
+        );
+
+        assert_eq!(cache.size(), 2);
+
+        // Access prompt1 to make prompt2 the oldest
+        let _ = cache.lookup("model", &[1.0, 0.0, 0.0]);
+        std::thread::sleep(std::time::Duration::from_millis(10));
+
+        // Insert third entry -> should evict prompt2
+        cache.insert(
+            "model".to_string(),
+            "prompt3".to_string(),
+            vec![0.0, 0.0, 1.0],
+            "answer3".to_string(),
+        );
+
+        assert_eq!(cache.size(), 2);
+        assert!(cache.lookup("model", &[1.0, 0.0, 0.0]).is_some());
+        assert!(cache.lookup("model", &[0.0, 1.0, 0.0]).is_none());
+        assert!(cache.lookup("model", &[0.0, 0.0, 1.0]).is_some());
+    }
+}

@@ -2,6 +2,10 @@
 name = "semantic-cache-proxy"
 version = "0.1.0"
 edition = "2021"
+description = "High-performance OpenAI-compatible semantic caching reverse proxy with local vector embeddings"
+readme = "README.md"
+keywords = ["openai", "semantic-cache", "proxy", "llm", "fastembed"]
+categories = ["network-programming", "web-programming::http-server", "science"]
 
 [dependencies]
 axum = { version = "0.7", features = ["json", "macros"] }

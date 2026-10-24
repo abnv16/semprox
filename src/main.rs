@@ -1,4 +1,3 @@
-
 mod cache;
 mod embedder;
 mod handlers;
@@ -24,11 +23,7 @@ struct Args {
     #[arg(long, env = "PROXY_PORT", default_value_t = 8080)]
     port: u16,
 
-    #[arg(
-        long,
-        env = "UPSTREAM_URL",
-        default_value = "https://api.openai.com"
-    )]
+    #[arg(long, env = "UPSTREAM_URL", default_value = "https://api.openai.com")]
     upstream_url: String,
 
     #[arg(long, env = "SIMILARITY_THRESHOLD", default_value_t = 0.90)]
@@ -52,8 +47,7 @@ async fn main() -> Result<()> {
     tracing_subscriber::fmt()
         .json()
         .with_env_filter(
-            EnvFilter::try_from_default_env()
-                .unwrap_or_else(|_| EnvFilter::new("info")),
+            EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info")),
         )
         .init();
 
